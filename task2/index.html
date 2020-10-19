@@ -8,20 +8,16 @@
     <link rel="stylesheet" href="style.css">
     <script async src="main.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery.maskedinput@1.4.1/src/jquery.maskedinput.min.js" type="text/javascript"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <script src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
 </head>
 
-<body>
+<body class = 'container justify-content-center' onload='setStyle()'>
 
     <input type="file" onchange="readFile(this)">
-    <section class = "main container"></section>
-
-    <script>
-    let parrent = document.querySelector('section');
-    </script>
 
 </body>
 

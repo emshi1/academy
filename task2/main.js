@@ -1,6 +1,5 @@
 "use strict";
 
-
 function readFile(input) {
     let file = input.files[0];
 
@@ -12,11 +11,12 @@ function readFile(input) {
         console.log(reader.result);
         parse(reader.result);
     };
+    document.body.innerHTML = ""; 
 
     reader.onerror = function () {
         console.log(reader.error);
     };
-
+    
 }
 
 function parse(file) {
@@ -26,21 +26,37 @@ function parse(file) {
 }
 
 function createElem(obj) {
+    let br = document.createElement('br');
+
+    let reset = document.createElement('button');
+    reset.setAttribute('onclick', 'resetBut()');
+    reset.setAttribute('class', 'reset');
+    reset.textContent = 'Reset';
+
+    document.body.appendChild(reset);
+
     for (let key in obj) {
         switch (key) {
             case "fields":
                 createFields(obj[key]);
+                document.body.appendChild(br);
                 break;
             case "references":
                 createRef(obj[key]);
+                document.body.appendChild(br);
                 break;
             case "buttons":
+                document.body.appendChild(br);
                 createButtons(obj[key]);
+                document.body.appendChild(br);
                 break;
             default:
                 break;
         }
     }
+    
+
+    setStyle();
 }
 
 function createFields(obj) {
@@ -52,21 +68,91 @@ function createFields(obj) {
 function fFields(obj) {
     let br = document.createElement('br');
     let myLabel = document.createElement('label');
+    let myForm = document.createElement('form');
     let myInput = document.createElement('input');
     let values = Object.values(obj);
+
     console.log(values);
+
     for (let i in values) {
         if (typeof (values[i]) == "string")
-            myLabel.textContent = values[i];
+            myLabel.textContent = values[i] + '\n';
         else {
-            for (let key in values[i])
-                myInput.setAttribute(key, (values[i])[key]);
+            for (let key in values[i]){
+                if (key == "filetype") {
+                    myInput.setAttribute("accept", "image/png, image/jpeg, image/pdf");
+                }
+                switch ((values[i])[key]){
+                    case "color":
+                    case "technology":
+                        myInput =document.createElement('select');
+                        createSelect(myInput, values[i]);
+                        break;
+                    case "checkbox":
+                        myInput.setAttribute(key, (values[i])[key]);
+                        myInput.setAttribute('onchange', 'checkboxChange()');
+                        break;
+                    case "textarea":
+                        myInput = document.createElement('textarea');
+                        myInput.setAttribute(key, (values[i])[key]);
+                        break;
+                    default:
+                        checkMask(key, (values[i])[key], myInput);
+                        myInput.setAttribute(key, (values[i])[key]);
+                } 
+            }
         }
-        parrent.appendChild(br);
+        //document.body.appendChild(br);
     }
+    
     myLabel.appendChild(myInput);
-    parrent.appendChild(myLabel);
-    parrent.appendChild(br);
+    if (myInput.tagName == 'SELECT') {
+        myForm.appendChild(myLabel);
+        document.body.appendChild(myForm);
+    } else
+        document.body.appendChild(myLabel);
+    
+        document.body.appendChild(br);
+}
+
+
+let count = 0;
+
+function checkMask(attr, maskValue, elem){
+    if (attr === 'mask'){
+        count++;
+        elem.removeAttribute('type', 'number');
+        elem.setAttribute("type", "text");
+        elem.setAttribute("class", "jqMask" + count);
+        $(elem).mask(maskValue);
+    }
+}
+
+function createSelect(elem, attr){
+    let option = [];
+    let i = 0;
+    for (let key in attr){
+        if (key == 'colors') {
+            elem.setAttribute('class', 'select');
+            elem.setAttribute('onchange', 'changeColor()');
+        }
+        if (key == 'technologies' || key == 'colors'){
+            for (i in attr[key]){
+            option[i]=document.createElement('option');
+            option[i].setAttribute('value', (attr[key])[i]);
+            option[i].textContent=(attr[key])[i];
+            elem.appendChild(option[i])
+            }
+        }
+    }
+    document.body.appendChild(elem);
+    
+}
+
+function changeColor(){
+    let sel = document.querySelector('select');
+    console.log(sel.value);
+    document.body.style.background=sel.value;
 }
 
 function createRef(obj) {
@@ -90,14 +176,12 @@ function fRef(obj) {
             myRef.setAttribute("href", obj[key]);
         else if (key === "text without ref") {
             let textNode = document.createElement('span');
-            textNode.textContent = obj[key];
-            
-            parrent.appendChild(textNode);
+            textNode.textContent = obj[key] + ' ';
+            document.body.appendChild(textNode);
         }
-        parrent.appendChild(br);
     }
-
-    parrent.appendChild(myRef);
+    document.body.appendChild(myRef);
+    document.body.appendChild(br);
     
 }
 
@@ -111,12 +195,45 @@ function fButtons(obj) {
     let myButt = document.createElement('button');
 
     for (let key in obj) {
-        if (key === "text")
+        if (key === "text"){
             myButt.textContent = obj[key];
+        }
         else
             myButt.setAttribute(key, obj[key]);
 
-         parrent.appendChild(br);
     }
-    parrent.appendChild(myButt);
+    document.body.appendChild(myButt);
+}
+
+function resetBut(){
+    document.body.innerHTML = ""; 
+    let firstInput = document.createElement('input');
+    firstInput.setAttribute('type', 'file');
+    firstInput.setAttribute('onchange', 'readFile(this)');
+    document.body.appendChild(firstInput);
+}
+
+function setStyle(){
+    let sel = document.querySelectorAll('select');
+    let but = document.querySelectorAll('button');
+    let inp = document.querySelectorAll('input');
+    let i;
+    for (i = 0; i<sel.length; i++)
+        sel[i].classList.add('custom-select');
+
+    for (i = 0; i<but.length; i++){
+        but[i].classList.add('btn-primary');
+        but[i].classList.add('btn');
+    }
+
+    for (i = 0; i<inp.length; i++){
+        inp[i].classList.add('form-control');
+        if (inp[i].getAttribute('type') == 'checkbox')
+            inp[i].classList.remove('form-control');
+    }
+
+}
+
+function checkboxChange() {
+    document.body.style.background = ('#e4f2ff');
 }
