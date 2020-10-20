@@ -210,6 +210,7 @@ function resetBut(){
     let firstInput = document.createElement('input');
     firstInput.setAttribute('type', 'file');
     firstInput.setAttribute('onchange', 'readFile(this)');
+    firstInput.classList.add('form-control');
     document.body.appendChild(firstInput);
 }
 
